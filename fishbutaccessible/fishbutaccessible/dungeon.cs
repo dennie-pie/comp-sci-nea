@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,7 +12,7 @@ namespace fish
         private bool centre, hasRoom;
 
         public void setHR(bool hr) { hasRoom = hr; }
-
+        public bool getHR() { return hasRoom; }
         public string getLoc()
         {
             return location;
@@ -22,7 +22,6 @@ namespace fish
             location = loc;
             centre = cent;
             hasRoom = false;
-            Console.WriteLine(location);
         }
     }
 
@@ -63,7 +62,7 @@ namespace fish
             for (int i = 0; i <= drunkards; i++)
             {
                 drunkard dr = new drunkard("44");
-
+                dr.walk();
             }
         }
     }
