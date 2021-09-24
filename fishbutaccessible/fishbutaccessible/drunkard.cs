@@ -28,7 +28,7 @@ namespace fish
             Random r = new Random();
             steps.Add(44);
             moves.Add("start");
-
+            turn();
             for (int i = 0; i <= stepamount; i++)
             {
                 Console.WriteLine($"i started at {startpos}, i am currently at {currpos} and my last move was {moves.Last()}");
@@ -36,7 +36,8 @@ namespace fish
                 do
                 {
                     Console.WriteLine("moving");
-                    int nextmove = r.Next(0,100);
+                    
+                    int nextmove = r.Next(100);
                     if (nextmove > 50) { moveVal = turn(); }
                     else { moveVal = forward(); }
                 }
@@ -48,16 +49,57 @@ namespace fish
         public bool turn()
         {
             Random r = new Random();
-            Console.WriteLine("well this isnt implemented yet but imagine you just did a great big turn in whatever diection");
-            r.Next()
+            bool valid = false;
+            do
+            {
+                int turndir = r.Next(4);
+                switch (turndir) //1 = left, 2 = up, 3 = right, 4 = down
+                {
+                    case (0):
+                        valid = validatePos(currpos - 1, "lt");
+                        if (valid)
+                        {
+                            moves.Add("lt");
+                            currpos -= 1;
+                            steps.Add(currpos);
+                        }
+                        break;
+                    case (1):
+                        valid = validatePos(currpos + 10, "ut");
+                        if (valid)
+                        {
+                            moves.Add("ut");
+                            currpos += 10;
+                            steps.Add(currpos);
+                        }
+                        break;
+                    case (2):
+                        valid = validatePos(currpos + 1, "rt");
+                        if (valid)
+                        {
 
+                            moves.Add("rt");
+                            currpos += 1;
+                            steps.Add(currpos);
+                        }
+                        break;
+                    case (3):
+                        valid = validatePos(currpos - 10, "dt");
+                        if (valid)
+                        {
 
-
-
-
+                            moves.Add("dt");
+                            currpos -= 10;
+                            steps.Add(currpos);
+                        }
+                        break;
+                }
+            } while (valid);
+            
 
             return true;
         }
+
         public bool forward()
         {
             bool valid;
@@ -109,20 +151,47 @@ namespace fish
         public bool validatePos(int pos)
         {
             string p = Convert.ToString(pos);
-            if (!steps.Contains(pos) && !map[Convert.ToInt16(p[0]), Convert.ToInt16(p[1])].getHR())
+            char y = p[0];
+            char x = p[1];
+            Console.WriteLine($"{Convert.ToString(p[0])} and {Convert.ToString(p[1])}");
+            if (steps.Contains(pos) | y > 8 | x > 8) //&& map[Convert.ToInt16(p[0]), Convert.ToInt16(p[1])].getHR()
             {
-                return true;
+                Console.WriteLine("what");
+                return false;
             }
-            else { return false; }
+            else { return true; }
         }
         public bool validatePos(int pos, string currm)
         {
             string p = Convert.ToString(pos);
-            if (!steps.Contains(pos) && !map[Convert.ToInt16(p[0]), Convert.ToInt16(p[1])].getHR() && moves.Last() != currm)
+            char tempy = p[0];
+            char tempx = p[1];
+            int y = Convert.ToInt16(tempy);
+            int x = Convert.ToInt16(tempx); // fix please
+            Console.WriteLine($"{Convert.ToString(y)} and {Convert.ToString(x)}");
+            if (steps.Contains(pos)) //!map[Convert.ToInt16(p[0]), Convert.ToInt16(p[1])].getHR()
             {
-                return true;
+                Console.WriteLine("what (position is in steps somehow)");
+                return false;
             }
-            else { return false; }
+            else if (moves.Last() == currm)
+            {
+                Console.Write($"last move = {moves.Last()} this move = {currm}");
+                Console.WriteLine("what (current move???)");
+                return false;
+            }
+            else if (y > 8)
+            {
+                Console.WriteLine($"what ({y}>8????) {y > 8}");
+                return false;
+            }
+            else if (x > 8)
+            {
+                Console.WriteLine($"what ({x}>8?????????????????????????) {x > 8}");
+                return false;
+            }
+            else { return true; }
         }
     }
 }
+
