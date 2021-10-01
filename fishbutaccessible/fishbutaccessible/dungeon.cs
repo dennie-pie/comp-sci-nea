@@ -8,18 +8,21 @@ namespace fish
 
     class Cells
     {
-        private string location;
+        private int x, y;
+        private int[] loc;
         private bool centre, hasRoom;
 
         public void setHR(bool hr) { hasRoom = hr; }
         public bool getHR() { return hasRoom; }
-        public string getLoc()
+        public int[] getLoc()
         {
-            return location;
+            return loc;
         }
-        public Cells(string loc, bool cent)
+        public Cells(int X, int Y, bool cent)
         {
-            location = loc;
+            x = X;
+            y = Y;
+            loc = new int[2] { x, y };
             centre = cent;
             hasRoom = false;
         }
@@ -46,8 +49,8 @@ namespace fish
                 {
                     string loc;
                     loc = (Convert.ToString(y) + Convert.ToString(x));
-                    if (loc == "44") { Cells cell = new Cells(loc, true); cell.setHR(true); }
-                    else { Cells cell = new Cells(loc, false); }
+                    if (loc == "44") { Cells cell = new Cells(x, y, true); cell.setHR(true); }
+                    else { Cells cell = new Cells(x, y, false); }
                 }
             }
 
@@ -61,8 +64,12 @@ namespace fish
             int drunkards = r.Next(2, 4);
             for (int i = 0; i <= drunkards; i++)
             {
-                drunkard dr = new drunkard("44");
-                dr.walk();
+                drunkard dr = new drunkard(4,4);
+                List<int[]> tempSteps = dr.walk();
+                foreach(var j in tempSteps)
+                {
+                    dungeonMap[j[0], j[1]].setHR(true);
+                }
             }
         }
     }
