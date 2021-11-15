@@ -8,12 +8,12 @@ namespace fish
     class drunkard
     {
         private dungeon d = new dungeon();
-        private int startx, starty, stepamount, currx, curry;
+        private int startx, starty, stepamount, currx, curry, gen;
         private List<int[]> steps;
         private List<string> moves; //moves can be: lt (left turn) ut (up turn) rt (right turn) dt (down turn) lf (left forward) uf (up forward) rf (right forward) df (down forward)
         private Cells[,] map; //left motion, -1, up motion +10, down motion -10, right motion +1
 
-        public drunkard(int sx, int sy)
+        public drunkard(int sx, int sy, int Gen)
         {
             moves = new List<string>();
             steps = new List<int[]>();
@@ -23,22 +23,31 @@ namespace fish
             currx = sx;
             curry = sy;
             stepamount = 5;
+            gen = Gen;
+        }
+
+        public void stepsPrep()
+        {
+            foreach (var ceLL in map)
+            {
+                if (ceLL.getHR())
+                {
+                    steps.Add(new int[] { ceLL.getLoc()[0], ceLL.getLoc()[1], Convert.ToInt32(ceLL.getGen()) });
+                }
+            }
         }
 
         public List<int[]> walk()
         {
             Random r = new Random();
-            steps.Add(new int[]{4,4});
+            stepsPrep();
             moves.Add("start");
             turn();
             for (int i = 0; i <= stepamount; i++)
             {
-                Console.WriteLine($"i started at {startx}{starty}, i am currently at {currx}{curry} and my last move was {moves.Last()}");
                 bool moveVal;
                 do
                 {
-                    Console.WriteLine("moving");
-                    
                     int nextmove = r.Next(100);
                     if (nextmove > 50) { moveVal = turn(); }
                     else { moveVal = forward(); }
@@ -63,7 +72,7 @@ namespace fish
                         {
                             moves.Add("lt");
                             currx -= 1;
-                            steps.Add(new int[] { currx, curry });
+                            steps.Add(new int[] { currx, curry, gen });
                         }
                         break;
                     case (1):
@@ -72,7 +81,7 @@ namespace fish
                         {
                             moves.Add("ut");
                             curry += 1;
-                            steps.Add(new int[] { currx, curry });
+                            steps.Add(new int[] { currx, curry, gen });
                         }
                         break;
                     case (2):
@@ -82,7 +91,7 @@ namespace fish
 
                             moves.Add("rt");
                             currx += 1;
-                            steps.Add(new int[] { currx, curry });
+                            steps.Add(new int[] { currx, curry, gen });
                         }
                         break;
                     case (3):
@@ -92,7 +101,7 @@ namespace fish
 
                             moves.Add("dt");
                             curry -= 1;
-                            steps.Add(new int[] { currx, curry });
+                            steps.Add(new int[] { currx, curry, gen });
                         }
                         break;
                 }
@@ -114,7 +123,7 @@ namespace fish
                     {
                         moves.Add("lf");
                         currx -= 1;
-                        steps.Add(new int[] { currx, curry });
+                        steps.Add(new int[] { currx, curry, gen });
                     }
                     return valid;
                 case ("dt"):
@@ -124,7 +133,7 @@ namespace fish
                     {
                         moves.Add("df");
                         curry -= 1;
-                        steps.Add(new int[] { currx, curry });
+                        steps.Add(new int[] { currx, curry, gen });
                     }
                     return valid;
                 case ("rt"):
@@ -134,7 +143,7 @@ namespace fish
                     {
                         moves.Add("rf");
                         currx += 1;
-                        steps.Add(new int[] { currx, curry }) ;
+                        steps.Add(new int[] { currx, curry, gen }) ;
                     }
                     return valid;
                 case ("ut"):
@@ -144,7 +153,7 @@ namespace fish
                     {
                         moves.Add("uf");
                         curry += 1;
-                        steps.Add(new int[] { currx, curry });
+                        steps.Add(new int[] { currx, curry, gen });
                     }
                     return valid;
             }
@@ -153,7 +162,7 @@ namespace fish
         public bool validatePos(int x,int y)
         {
             int[] pos = new int[] { x, y };
-            if (steps.Contains(pos) | y > 8 | x > 8) //&& map[Convert.ToInt16(p[0]), Convert.ToInt16(p[1])].getHR()
+            if (steps.Contains(pos) | y > 8 | x > 8 | y < 0 | x < 0)
             {
                 return false;
             }
@@ -162,7 +171,7 @@ namespace fish
         public bool validatePos(int x, int y, string currm)
         {
             int[] pos = new int[] { x, y };
-            if (steps.Contains(pos) || moves.Last() == currm || y > 8 || x > 8) //!map[Convert.ToInt16(p[0]), Convert.ToInt16(p[1])].getHR()
+            if (steps.Contains(pos) || moves.Last() == currm || y > 8 || x > 8 || y < 0 || x < 0) //!map[Convert.ToInt16(p[0]), Convert.ToInt16(p[1])].getHR()
             {
                 return false;
             }
@@ -170,4 +179,3 @@ namespace fish
         }
     }
 }
-
