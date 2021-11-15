@@ -6,5 +6,7 @@ probably very bad but i did my best? hopefully. im writing this before i start l
 -------------GAME INCLUDES-------------
 
 -procedurally generaated levels
+
 -terrible character design
+
 -hopefully really good art :o)
