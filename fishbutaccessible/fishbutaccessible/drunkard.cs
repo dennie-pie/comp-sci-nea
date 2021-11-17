@@ -7,14 +7,15 @@ namespace fish
 {
     class drunkard
     {
-        private dungeon d = new dungeon();
+        private dungeon d;
         private int startx, starty, stepamount, currx, curry, gen;
         private List<int[]> steps;
         private List<string> moves; //moves can be: lt (left turn) ut (up turn) rt (right turn) dt (down turn) lf (left forward) uf (up forward) rf (right forward) df (down forward)
         private Cells[,] map; //left motion, -1, up motion +10, down motion -10, right motion +1
 
-        public drunkard(int sx, int sy, int Gen)
+        public drunkard(int sx, int sy, int Gen, dungeon D)
         {
+            d = D;
             moves = new List<string>();
             steps = new List<int[]>();
             map = d.getMap();
