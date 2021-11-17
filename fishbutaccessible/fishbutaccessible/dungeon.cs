@@ -14,7 +14,6 @@ namespace fish
         private string gen;
 
         public void setHR(bool hr) { hasRoom = hr; }
-        public bool getHR() { return hasRoom; }
         public string getGen() { return gen; }
         public void setGen(string ng) { gen = ng; }
         public int[] getLoc()
@@ -74,42 +73,14 @@ namespace fish
             int drunkards = r.Next(2, 4);
             for (int i = 0; i <= drunkards; i++)
             {
-                drunkard dr = new drunkard(4,4,i+1);
+                drunkard dr = new drunkard(4,4,i+1, dungeonMap);
                 List<int[]> tempSteps = dr.walk();
                 foreach(var j in tempSteps)
                 {
-                    Console.WriteLine($"{j[0]},{j[1]}");
                     dungeonMap[j[0], j[1]].setHR(true);
                     dungeonMap[j[0], j[1]].setGen(Convert.ToString(j[2]));
                 }
-                for (int l = 0; l < 9; l++)
-                {
-                    Console.WriteLine();
-                    for (int j = 0; j < 9; j++)
-                    {
-                        switch (dungeonMap[l, j].getGen())
-                        {
-                            case "centre":
-                                Console.Write("[*]");
-                                break;
-                            case "1":
-                                Console.Write("[1]");
-                                break;
-                            case "2":
-                                Console.Write("[2]");
-                                break;
-                            case "3":
-                                Console.Write("[3]");
-                                break;
-                            case "4":
-                                Console.Write("[4]");
-                                break;
-                            case null:
-                                Console.Write("| |");
-                                break;
-                        }
-                    }
-                }
+                tempDrawMap();
             }
         }
 
