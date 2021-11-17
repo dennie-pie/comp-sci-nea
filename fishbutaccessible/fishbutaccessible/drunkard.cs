@@ -7,53 +7,54 @@ namespace fish
 {
     class drunkard
     {
-        private dungeon d;
+        private Random r;
         private int startx, starty, stepamount, currx, curry, gen;
         private List<int[]> steps;
         private List<string> moves; //moves can be: lt (left turn) ut (up turn) rt (right turn) dt (down turn) lf (left forward) uf (up forward) rf (right forward) df (down forward)
         private Cells[,] map; //left motion, -1, up motion +10, down motion -10, right motion +1
 
-        public drunkard(int sx, int sy, int Gen, dungeon D)
+        public drunkard(int sx, int sy, int Gen, Cells[,] Map)
         {
-            d = D;
+            r = new Random();
             moves = new List<string>();
             steps = new List<int[]>();
-            map = d.getMap();
+            map = Map;
             startx = sx;
             starty = sy;
             currx = sx;
             curry = sy;
-            stepamount = 5;
+            stepamount = r.Next(3,5);
             gen = Gen;
         }
 
-        public void stepsPrep()
+        public void prepSteps()
         {
-            foreach (var ceLL in map)
+            foreach (var step in map)
             {
-                if (ceLL.getHR())
-                {
-                    steps.Add(new int[] { ceLL.getLoc()[0], ceLL.getLoc()[1], Convert.ToInt32(ceLL.getGen()) });
-                }
+                int[] loc = step.getLoc();
+                int[] temp = new int[3];
+                Console.WriteLine($"{loc[0]}, {loc[1]}");
+                if (step.getGen() == "centre") { temp[0] = loc[0]; temp[1] = loc[1]; temp[3] = 1; }
+                else { temp[0] = loc[0]; temp[1] = loc[1]; temp[3] = Convert.ToInt32(step.getGen()); }
+                
+                steps.Add(temp);
             }
         }
 
         public List<int[]> walk()
         {
-            Random r = new Random();
-            stepsPrep();
+            prepSteps();
             moves.Add("start");
             turn();
             for (int i = 0; i <= stepamount; i++)
             {
-                bool moveVal;
-                do
+                bool moveVal = false;
+                while (!moveVal)
                 {
                     int nextmove = r.Next(100);
-                    if (nextmove > 50) { moveVal = turn(); }
+                    if (nextmove > 30) { moveVal = turn(); }
                     else { moveVal = forward(); }
                 }
-                while (!moveVal);
             }
             return steps;
         }
@@ -62,8 +63,6 @@ namespace fish
         {
             Random r = new Random();
             bool valid = false;
-            do
-            {
                 int turndir = r.Next(4);
                 switch (turndir) //1 = left, 2 = up, 3 = right, 4 = down
                 {
@@ -75,7 +74,7 @@ namespace fish
                             currx -= 1;
                             steps.Add(new int[] { currx, curry, gen });
                         }
-                        break;
+                        return valid;
                     case (1):
                         valid = validatePos(currx, curry + 1, "ut");
                         if (valid)
@@ -84,32 +83,27 @@ namespace fish
                             curry += 1;
                             steps.Add(new int[] { currx, curry, gen });
                         }
-                        break;
+                        return valid;
                     case (2):
                         valid = validatePos(currx + 1, curry, "rt");
                         if (valid)
                         {
-
                             moves.Add("rt");
                             currx += 1;
                             steps.Add(new int[] { currx, curry, gen });
                         }
-                        break;
+                        return valid;
                     case (3):
                         valid = validatePos(currx, curry - 1, "dt");
                         if (valid)
                         {
-
                             moves.Add("dt");
                             curry -= 1;
                             steps.Add(new int[] { currx, curry, gen });
                         }
-                        break;
+                        return valid;
                 }
-            } while (valid);
-            
-
-            return true;
+            return valid;
         }
 
         public bool forward()
@@ -167,6 +161,10 @@ namespace fish
             {
                 return false;
             }
+            if (y == 4 & x == 4)
+            {
+                return false;
+            }
             return true;
         }
         public bool validatePos(int x, int y, string currm)
@@ -176,7 +174,13 @@ namespace fish
             {
                 return false;
             }
+            if (y == 4 & x == 4)
+            {
+                return false;
+            }
             return true;
         }
+
+   
     }
 }
