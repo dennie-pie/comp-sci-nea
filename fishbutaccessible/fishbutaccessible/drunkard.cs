@@ -7,18 +7,17 @@ namespace fish
 {
     class drunkard
     {
+        private CellOverlord c;
         private Random r;
         private int startx, starty, stepamount, currx, curry, gen;
-        private List<int[]> steps;
         private List<string> moves; //moves can be: lt (left turn) ut (up turn) rt (right turn) dt (down turn) lf (left forward) uf (up forward) rf (right forward) df (down forward)
-        private Cells[,] map; //left motion, -1, up motion +10, down motion -10, right motion +1
+         //left motion, -1, up motion +10, down motion -10, right motion +1
 
-        public drunkard(int sx, int sy, int Gen, Cells[,] Map)
+        public drunkard(int sx, int sy, int Gen, CellOverlord C)
         {
             r = new Random();
             moves = new List<string>();
-            steps = new List<int[]>();
-            map = Map;
+            c = C;
             startx = sx;
             starty = sy;
             currx = sx;
@@ -27,36 +26,20 @@ namespace fish
             gen = Gen;
         }
 
-        public void prepSteps()
+        public void walk()
         {
-            foreach (var step in map)
-            {
-                int[] loc = step.getLoc();
-                int[] temp = new int[3];
-                Console.WriteLine($"{loc[0]}, {loc[1]}");
-                if (step.getGen() == "centre") { temp[0] = loc[0]; temp[1] = loc[1]; temp[3] = 1; }
-                else { temp[0] = loc[0]; temp[1] = loc[1]; temp[3] = Convert.ToInt32(step.getGen()); }
-                
-                steps.Add(temp);
-            }
-        }
-
-        public List<int[]> walk()
-        {
-            prepSteps();
             moves.Add("start");
             turn();
             for (int i = 0; i <= stepamount; i++)
             {
-                bool moveVal = false;
-                while (!moveVal)
+                bool valid = false;
+                while (!valid)
                 {
                     int nextmove = r.Next(100);
-                    if (nextmove > 30) { moveVal = turn(); }
-                    else { moveVal = forward(); }
+                    if (nextmove > 20) { valid = turn(); }
+                    else { valid = forward(); }
                 }
             }
-            return steps;
         }
 
         public bool turn()
@@ -72,7 +55,7 @@ namespace fish
                         {
                             moves.Add("lt");
                             currx -= 1;
-                            steps.Add(new int[] { currx, curry, gen });
+                            c.setRoom(currx, curry, Convert.ToString(gen));
                         }
                         return valid;
                     case (1):
@@ -81,16 +64,16 @@ namespace fish
                         {
                             moves.Add("ut");
                             curry += 1;
-                            steps.Add(new int[] { currx, curry, gen });
+                            c.setRoom(currx, curry, Convert.ToString(gen));
                         }
-                        return valid;
+                    return valid;
                     case (2):
                         valid = validatePos(currx + 1, curry, "rt");
                         if (valid)
                         {
                             moves.Add("rt");
                             currx += 1;
-                            steps.Add(new int[] { currx, curry, gen });
+                            c.setRoom(currx, curry, Convert.ToString(gen)); 
                         }
                         return valid;
                     case (3):
@@ -99,7 +82,7 @@ namespace fish
                         {
                             moves.Add("dt");
                             curry -= 1;
-                            steps.Add(new int[] { currx, curry, gen });
+                            c.setRoom(currx, curry, Convert.ToString(gen));
                         }
                         return valid;
                 }
@@ -118,7 +101,7 @@ namespace fish
                     {
                         moves.Add("lf");
                         currx -= 1;
-                        steps.Add(new int[] { currx, curry, gen });
+                        c.setRoom(currx, curry, Convert.ToString(gen));
                     }
                     return valid;
                 case ("dt"):
@@ -128,7 +111,7 @@ namespace fish
                     {
                         moves.Add("df");
                         curry -= 1;
-                        steps.Add(new int[] { currx, curry, gen });
+                        c.setRoom(currx, curry, Convert.ToString(gen));
                     }
                     return valid;
                 case ("rt"):
@@ -138,7 +121,7 @@ namespace fish
                     {
                         moves.Add("rf");
                         currx += 1;
-                        steps.Add(new int[] { currx, curry, gen }) ;
+                        c.setRoom(currx, curry, Convert.ToString(gen));
                     }
                     return valid;
                 case ("ut"):
@@ -148,7 +131,7 @@ namespace fish
                     {
                         moves.Add("uf");
                         curry += 1;
-                        steps.Add(new int[] { currx, curry, gen });
+                        c.setRoom(currx, curry, Convert.ToString(gen));
                     }
                     return valid;
             }
@@ -156,12 +139,7 @@ namespace fish
         }
         public bool validatePos(int x,int y)
         {
-            int[] pos = new int[] { x, y };
-            if (steps.Contains(pos) | y > 8 | x > 8 | y < 0 | x < 0)
-            {
-                return false;
-            }
-            if (y == 4 & x == 4)
+            if ( y >= c.getmMapSize() || x >= c.getmMapSize() || c.hasRoom(x, y) || y < 0 || x < 0)
             {
                 return false;
             }
@@ -169,18 +147,12 @@ namespace fish
         }
         public bool validatePos(int x, int y, string currm)
         {
-            int[] pos = new int[] { x, y };
-            if (steps.Contains(pos) || moves.Last() == currm || y > 8 || x > 8 || y < 0 || x < 0) //!map[Convert.ToInt16(p[0]), Convert.ToInt16(p[1])].getHR()
-            {
-                return false;
-            }
-            if (y == 4 & x == 4)
+            if (moves.Last() == currm || y >= c.getmMapSize() || x >= c.getmMapSize() || c.hasRoom(x, y) || y < 0 || x < 0)
             {
                 return false;
             }
             return true;
         }
-
-   
     }
 }
+
