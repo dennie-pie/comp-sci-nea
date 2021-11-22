@@ -6,8 +6,8 @@ namespace fish
     {
         static void Main(string[] args)
         {
-            dungeon d = new dungeon();
-            d.setDungeonMap();
+            CellOverlord c = new CellOverlord();
+            dungeon d = new dungeon(c);
             d.generate();
         }
     }
