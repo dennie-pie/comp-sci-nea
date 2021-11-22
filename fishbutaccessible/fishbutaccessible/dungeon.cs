@@ -5,42 +5,45 @@ using System.Text;
 
 namespace fish
 {
-
     class Cells
     {
-        private int x, y;
-        private int[] loc;
         private bool hasRoom;
         private string gen;
 
         public void setHR(bool hr) { hasRoom = hr; }
+        public bool getHR() { return hasRoom; }
         public string getGen() { return gen; }
         public void setGen(string ng) { gen = ng; }
-        public int[] getLoc()
+
+        public Cells(string cent)
         {
-            return loc;
-        }
-        public Cells(int X, int Y, string cent)
-        {
-            x = X;
-            y = Y;
-            loc = new int[2] { x, y };
             gen = cent;
             hasRoom = false;
         }
-        public Cells(int X, int Y)
+        public Cells()
         {
-            x = X;
-            y = Y;
-            loc = new int[2] { x, y };
+            gen = null;
             hasRoom = false;
         }
     }
-
-    class dungeon
+    class CellOverlord
     {
-        private Cells[,] dungeonMap = new Cells[9, 9];
+        private Cells[,] dungeonMap;
+        private int mapSize;
+        public CellOverlord()
+        {
+            mapSize = 9;
+            dungeonMap = new Cells[mapSize, mapSize];
 
+            for (int i = 0; i < mapSize; i++)
+            {
+                for (int j = 0; j < mapSize; j++)
+                {
+                    dungeonMap[i, j] = new Cells();
+                }
+            }
+        }
+        public int getmMapSize() { return mapSize; }
         public Cells[,] getMap()
         {
             return dungeonMap;
@@ -49,20 +52,18 @@ namespace fish
         {
             dungeonMap = newMap;
         }
+        public bool hasRoom(int x, int y) { return dungeonMap[x, y].getHR(); }
+        public void setRoom(int x, int y, string gen) { dungeonMap[x, y].setHR(true); dungeonMap[x, y].setGen(gen); }
+        public void setEmpty(int x, int y) { dungeonMap[x, y].setHR(false); }
+        public string getGen(int x, int y) { return dungeonMap[x, y].getGen(); }
+    }
 
-        public void setDungeonMap()
+    class dungeon
+    {
+        private CellOverlord c;
+        public dungeon(CellOverlord C)
         {
-            for (int x = 0; x <= 8; x++)
-            {
-                for (int y = 0; y <= 8; y++)
-                {
-                    string loc;
-                    loc = (Convert.ToString(y) + Convert.ToString(x));
-                    if (loc == "44") { Cells cell = new Cells(x, y, "centre"); cell.setHR(true); dungeonMap[x, y] = cell; }
-                    else { Cells cell = new Cells(x, y); dungeonMap[x, y] = cell; }
-                }
-            }
-
+            c = C;
         }
 
         public void generate()
@@ -70,18 +71,15 @@ namespace fish
             //this is where it all happens baby
             //the cell at pos 44 already has a room in it. now we will pick a random number between 2-4 to see how many drunkards we will start with.
             Random r = new Random();
+            c.setRoom(4, 4, "centre");
             int drunkards = r.Next(2, 4);
             for (int i = 0; i <= drunkards; i++)
             {
-                drunkard dr = new drunkard(4,4,i+1, dungeonMap);
-                List<int[]> tempSteps = dr.walk();
-                foreach(var j in tempSteps)
-                {
-                    dungeonMap[j[0], j[1]].setHR(true);
-                    dungeonMap[j[0], j[1]].setGen(Convert.ToString(j[2]));
-                }
+                drunkard dr = new drunkard(4,4,i+1, c);
+                dr.walk();
                 tempDrawMap();
             }
+
         }
 
         public void tempDrawMap()
@@ -91,7 +89,7 @@ namespace fish
                 Console.WriteLine();
                 for (int j = 0; j < 9; j++)
                 {
-                    switch (dungeonMap[i, j].getGen())
+                    switch (c.getGen(i,j))
                     {
                         case "centre":
                             Console.Write("[*]");
